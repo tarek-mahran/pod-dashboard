@@ -227,6 +227,90 @@
   font-size: 1.1em;
 }
 
+/* HD Feedback Category Row Styles */
+.pivot-table .category-row {
+  font-weight: 600;
+  text-align: left;
+  padding-left: 15px;
+  height: 45px;
+  background: white;
+}
+
+.pivot-table .category-row.running-under-flm {
+  background: white;
+}
+
+.pivot-table .category-row.running-under-flm td {
+  background: white !important;
+}
+
+.pivot-table .category-row.updated-out-of-flm {
+  background: white;
+}
+
+.pivot-table .category-row.updated-out-of-flm td {
+  background: white !important;
+}
+
+.pivot-table .category-row td:first-child {
+  text-align: left;
+}
+
+.pivot-table .category-row td:not(:first-child) {
+  text-align: center;
+}
+
+.pivot-table .subcategory-row {
+  text-align: left;
+  font-size: 0.9em;
+  height: 45px;
+  background: white;
+}
+
+.pivot-table .subcategory-row td:first-child {
+  text-align: left;
+  padding-left: 27px;
+}
+
+.pivot-table .subcategory-row.running-under-flm {
+  background: white;
+}
+
+.pivot-table .subcategory-row.running-under-flm td {
+  background: white !important;
+}
+
+.pivot-table .subcategory-row.updated-out-of-flm {
+  background: white;
+}
+
+.pivot-table .subcategory-row.updated-out-of-flm td {
+  background: white !important;
+}
+
+.pivot-table .subcategory-row td:not(:first-child) {
+  text-align: center;
+}
+
+.pivot-table .expand-icon {
+  margin-right: 8px;
+  cursor: pointer;
+  user-select: none;
+  display: inline-block;
+  width: 16px;
+  text-align: center;
+  font-weight: bold;
+  transition: transform 0.2s ease;
+}
+
+.pivot-table .expand-icon.collapsed {
+  transform: rotate(-90deg);
+}
+
+.pivot-table tr.hidden-row {
+  display: none;
+}
+
 @media (max-width: 1024px) {
   .pivot-table-header {
     flex-direction: column;
