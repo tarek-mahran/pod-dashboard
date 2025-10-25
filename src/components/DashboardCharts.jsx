@@ -108,7 +108,7 @@ function DashboardCharts({ data }) {
       y: {
         beginAtZero: true,
         ticks: {
-          stepSize: 1,
+          maxTicksLimit: 10,
           font: {
             size: 11
           }
@@ -201,7 +201,7 @@ function DashboardCharts({ data }) {
       r: {
         beginAtZero: true,
         ticks: {
-          stepSize: 1,
+          maxTicksLimit: 8,
           font: {
             size: 11
           }
