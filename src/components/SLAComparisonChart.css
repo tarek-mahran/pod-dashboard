@@ -63,97 +63,120 @@
 .sla-vendor-section {
   border-radius: 15px;
   overflow: hidden;
-  border: 2px solid #e5e7eb;
+}
+
+.zain-section {
+  border: 3px solid #10b981;
+  background: #ecfdf5;
+}
+
+.latis-section {
+  border: 3px solid #3b82f6;
+  background: #eff6ff;
 }
 
 .sla-vendor-header {
-  padding: 15px 20px;
+  padding: 20px;
   color: white;
   text-align: center;
+  font-weight: 700;
 }
 
 .sla-vendor-header h3 {
   margin: 0;
-  font-size: 1.2em;
+  font-size: 1.3em;
+  letter-spacing: 1px;
 }
 
 .zain-header {
-  background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+  background: #10b981;
 }
 
 .latis-header {
-  background: linear-gradient(135deg, #ec4899 0%, #db2777 100%);
+  background: #3b82f6;
 }
 
 .sla-cards {
-  padding: 20px;
+  padding: 25px;
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  background: #f9fafb;
+  gap: 20px;
 }
 
-.sla-card {
-  border-radius: 12px;
-  padding: 15px 20px;
+.sla-row {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  transition: transform 0.2s, box-shadow 0.2s;
-  position: relative;
-  overflow: hidden;
+  gap: 15px;
 }
 
-.sla-card::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 0;
-  height: 100%;
-  width: 5px;
-  background: currentColor;
-}
-
-.sla-card:hover {
-  transform: translateX(5px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
-
-.sla-card.sla-green {
-  background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
-  border: 2px solid #10b981;
-  color: #065f46;
-}
-
-.sla-card.sla-yellow {
-  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
-  border: 2px solid #f59e0b;
-  color: #92400e;
-}
-
-.sla-card.sla-red {
-  background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
-  border: 2px solid #ef4444;
-  color: #991b1b;
-}
-
-.sla-card-severity {
+.severity-label {
+  min-width: 120px;
   font-weight: 600;
-  font-size: 1.1em;
+  font-size: 1em;
+  padding: 12px 20px;
+  background: white;
+  border: 2px solid #d1d5db;
+  border-radius: 10px;
+  text-align: center;
+}
+
+.sla-targets {
+  display: flex;
+  gap: 12px;
   flex: 1;
 }
 
-.sla-card-percentage {
-  font-size: 2em;
-  font-weight: 700;
-  margin: 0 15px;
+.sla-box {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
-.sla-card-label {
-  font-size: 0.85em;
-  opacity: 0.8;
-  text-align: right;
-  min-width: 80px;
+.box-label {
+  font-size: 0.75em;
+  font-weight: 700;
+  text-align: center;
+  padding: 6px 12px;
+  border-radius: 8px;
+  letter-spacing: 0.5px;
+}
+
+.target-box .box-label {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  color: white;
+}
+
+.hurdle-box .box-label {
+  background: linear-gradient(135deg, #eab308 0%, #ca8a04 100%);
+  color: white;
+}
+
+.box-value {
+  font-size: 1.5em;
+  font-weight: 700;
+  text-align: center;
+  padding: 15px;
+  border-radius: 10px;
+  border: 2px solid transparent;
+}
+
+.box-value.sla-green {
+  background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+  border-color: #10b981;
+  color: #065f46;
+}
+
+.box-value.sla-yellow {
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  border-color: #f59e0b;
+  color: #92400e;
+}
+
+.box-value.sla-red {
+  background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+  border-color: #ef4444;
+  color: #991b1b;
 }
 
 .sla-legend {
@@ -214,18 +237,16 @@
     flex-direction: column;
   }
 
-  .sla-card {
+  .sla-row {
     flex-direction: column;
-    text-align: center;
-    gap: 8px;
   }
 
-  .sla-card-percentage {
-    margin: 10px 0;
+  .severity-label {
+    width: 100%;
   }
 
-  .sla-card-label {
-    text-align: center;
+  .sla-targets {
+    width: 100%;
   }
 
   .sla-legend {
