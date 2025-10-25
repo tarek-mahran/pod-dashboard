@@ -134,8 +134,8 @@ function DashboardCharts({ data }) {
   const severityCounts = {
     'Emergency': 0,
     'Critical': 0,
-    'High': 0,
-    'Medium': 0
+    'Major': 0,
+    'Minor': 0
   };
 
   runningTickets.forEach(ticket => {
@@ -146,15 +146,15 @@ function DashboardCharts({ data }) {
   });
 
   const radarChartData = {
-    labels: ['Emergency', 'Critical', 'High', 'Medium'],
+    labels: ['Emergency', 'Critical', 'Major', 'Minor'],
     datasets: [
       {
         label: 'Running Tickets by Severity',
         data: [
           severityCounts['Emergency'],
           severityCounts['Critical'],
-          severityCounts['High'],
-          severityCounts['Medium']
+          severityCounts['Major'],
+          severityCounts['Minor']
         ],
         backgroundColor: 'rgba(99, 102, 241, 0.2)',
         borderColor: 'rgba(99, 102, 241, 1)',

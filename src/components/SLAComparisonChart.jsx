@@ -26,7 +26,7 @@ function SLAComparisonChart({ data }) {
       filteredData = filteredData.filter(r => r['Region'] === selectedRegion);
     }
 
-    const severities = ['Emergency', 'Critical', 'High', 'Medium'];
+    const severities = ['Emergency', 'Critical', 'Major', 'Minor'];
     const zainData = {};
     const latisData = {};
 
@@ -117,7 +117,7 @@ function SLAComparisonChart({ data }) {
             <h3>🏆 Zain SLA (Target)</h3>
           </div>
           <div className="sla-cards">
-            {['Emergency', 'Critical', 'High', 'Medium'].map(severity => (
+            {['Emergency', 'Critical', 'Major', 'Minor'].map(severity => (
               <div key={severity} className={`sla-card ${getColorClass(comparisonData.zain[severity].target)}`}>
                 <div className="sla-card-severity">{severity}</div>
                 <div className="sla-card-percentage">{comparisonData.zain[severity].target}%</div>
@@ -133,7 +133,7 @@ function SLAComparisonChart({ data }) {
             <h3>🎯 Latis SLA (Hurdle)</h3>
           </div>
           <div className="sla-cards">
-            {['Emergency', 'Critical', 'High', 'Medium'].map(severity => (
+            {['Emergency', 'Critical', 'Major', 'Minor'].map(severity => (
               <div key={severity} className={`sla-card ${getColorClass(comparisonData.latis[severity].hurdle)}`}>
                 <div className="sla-card-severity">{severity}</div>
                 <div className="sla-card-percentage">{comparisonData.latis[severity].hurdle}%</div>
