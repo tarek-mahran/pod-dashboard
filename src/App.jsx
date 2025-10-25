@@ -261,14 +261,14 @@ function App() {
 
         {displayData && (
           <>
-            <SLAComparisonChart data={displayData} />
-            <DashboardCharts data={displayData} />
-            <PivotTable data={displayData} onShowMessage={showMessage} />
             <Dashboard 
               data={displayData}
               uploadedFiles={uploadedFiles}
               onShowMessage={showMessage}
             />
+            <DashboardCharts data={displayData} />
+            <SLAComparisonChart data={displayData} />
+            <PivotTable data={displayData} onShowMessage={showMessage} />
           </>
         )}
       </div>

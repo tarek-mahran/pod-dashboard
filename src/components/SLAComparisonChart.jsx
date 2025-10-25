@@ -87,7 +87,7 @@ function SLAComparisonChart({ data }) {
   return (
     <div className="sla-comparison-container">
       <div className="sla-comparison-header">
-        <h2>📊 SLA Comparison Chart</h2>
+        <h2>🎯 SLA Performance Comparison</h2>
         <div className="sla-filters">
           <select
             value={selectedPOD}

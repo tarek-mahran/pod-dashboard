@@ -198,7 +198,7 @@ function PivotTable({ data, onShowMessage }) {
     <div className="pivot-table-container">
       <div className="pivot-table-header">
         <div className="pivot-table-title">
-          <h2>📋 {getTableTitle()}</h2>
+          <h2>⚡ {getTableTitle()}</h2>
         </div>
         <div className="pivot-table-controls">
           <select

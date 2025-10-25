@@ -68,55 +68,12 @@ function Dashboard({ data, uploadedFiles, onShowMessage }) {
     setDashboardData(stats);
   };
 
-  const handleDownload = async () => {
-    onShowMessage('Preparing download...', 'info');
-    
-    try {
-      const ExcelJS = (await import('exceljs')).default;
-      const workbook = new ExcelJS.Workbook();
-      const worksheet = workbook.addWorksheet('Merged Data');
-
-      // Add headers
-      const headers = Object.keys(data[0] || {});
-      worksheet.addRow(headers);
-
-      // Add data
-      data.forEach(row => {
-        const values = headers.map(header => row[header]);
-        worksheet.addRow(values);
-      });
-
-      // Generate and download
-      const buffer = await workbook.xlsx.writeBuffer();
-      const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'Merged_POD_Data.xlsx';
-      a.click();
-      window.URL.revokeObjectURL(url);
-
-      onShowMessage('Download complete!', 'success');
-    } catch (error) {
-      onShowMessage(`Download failed: ${error.message}`, 'error');
-    }
-  };
-
   if (!data || data.length === 0) {
     return null;
   }
 
   return (
     <div className="dashboard-container">
-      <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', marginBottom: '30px', marginTop: '40px', gap: '10px' }}>
-        <button
-          onClick={handleDownload}
-          style={{ padding: '8px 16px', background: '#10b981', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: '500', fontSize: '0.9em', transition: 'all 0.2s ease' }}
-        >
-          📥 Download
-        </button>
-      </div>
-
       {/* Dashboard Cards */}
       <div className="dashboard-cards" style={{ marginBottom: '40px' }}>
         <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr 1fr 1fr 1fr 1fr', gridTemplateRows: '1fr 1fr', gap: '16px' }}>
