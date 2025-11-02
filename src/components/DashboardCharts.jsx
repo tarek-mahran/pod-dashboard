@@ -33,56 +33,45 @@ function DashboardCharts({ data }) {
     return <div className="charts-loading">No data available for charts</div>;
   }
 
-  // Calculate region distribution with SA/NSA breakdown (exclude "Stuck")
-  const allTickets = data.filter(r => r['Region'] !== 'Stuck');
-  
-  const regionSACounts = {};
-  const regionNSACounts = {};
-  const regionTotalCounts = {};
-  
-  allTickets.forEach(ticket => {
+  // Calculate region distribution (exclude "Stuck")
+  const runningTickets = data.filter(r => r['Unified Status'] === 'Running' && r['Region'] !== 'Stuck');
+  const regionCounts = {};
+  runningTickets.forEach(ticket => {
     const region = ticket['Region'] || 'Unknown';
-    const impactService = ticket['Impact Service'];
-    
-    if (!regionSACounts[region]) {
-      regionSACounts[region] = 0;
-      regionNSACounts[region] = 0;
-      regionTotalCounts[region] = 0;
-    }
-    
-    if (impactService === 'SA') {
-      regionSACounts[region]++;
-    } else if (impactService === 'NSA') {
-      regionNSACounts[region]++;
-    }
-    
-    regionTotalCounts[region]++;
+    regionCounts[region] = (regionCounts[region] || 0) + 1;
   });
 
-  const regions = Object.keys(regionTotalCounts).sort();
-  const saValues = regions.map(region => regionSACounts[region] || 0);
-  const nsaValues = regions.map(region => regionNSACounts[region] || 0);
-  const totalValues = regions.map(region => regionTotalCounts[region]);
+  const regions = Object.keys(regionCounts).sort();
+  const regionValues = regions.map(region => regionCounts[region]);
 
-  // Bar Chart Data - SA & NSA by Region
   const barChartData = {
     labels: regions,
     datasets: [
       {
-        label: 'SA',
-        data: saValues,
-        backgroundColor: 'rgba(16, 185, 129, 0.8)', // Green
-        borderColor: 'rgba(16, 185, 129, 1)',
-        borderWidth: 1,
-        borderRadius: 4
-      },
-      {
-        label: 'NSA',
-        data: nsaValues,
-        backgroundColor: 'rgba(59, 130, 246, 0.8)', // Blue
-        borderColor: 'rgba(59, 130, 246, 1)',
-        borderWidth: 1,
-        borderRadius: 4
+        label: 'Running Tickets by Region',
+        data: regionValues,
+        backgroundColor: [
+          'rgba(99, 102, 241, 0.8)',
+          'rgba(236, 72, 153, 0.8)',
+          'rgba(16, 185, 129, 0.8)',
+          'rgba(245, 158, 11, 0.8)',
+          'rgba(239, 68, 68, 0.8)',
+          'rgba(168, 85, 247, 0.8)',
+          'rgba(59, 130, 246, 0.8)',
+          'rgba(34, 197, 94, 0.8)'
+        ],
+        borderColor: [
+          'rgba(99, 102, 241, 1)',
+          'rgba(236, 72, 153, 1)',
+          'rgba(16, 185, 129, 1)',
+          'rgba(245, 158, 11, 1)',
+          'rgba(239, 68, 68, 1)',
+          'rgba(168, 85, 247, 1)',
+          'rgba(59, 130, 246, 1)',
+          'rgba(34, 197, 94, 1)'
+        ],
+        borderWidth: 2,
+        borderRadius: 8
       }
     ]
   };
@@ -99,14 +88,12 @@ function DashboardCharts({ data }) {
             size: 12,
             weight: '500'
           },
-          padding: 15,
-          usePointStyle: true,
-          boxWidth: 15
+          padding: 15
         }
       },
       title: {
         display: true,
-        text: 'Tickets Per Regions (SA & NSA)',
+        text: '📍 Tickets Distribution by Region',
         font: {
           size: 16,
           weight: 'bold'
@@ -115,23 +102,13 @@ function DashboardCharts({ data }) {
           top: 10,
           bottom: 20
         }
-      },
-      tooltip: {
-        callbacks: {
-          afterLabel: function(context) {
-            const regionIndex = context.dataIndex;
-            const total = totalValues[regionIndex];
-            const percentage = ((context.parsed.y / total) * 100).toFixed(1);
-            return `${percentage}% of ${total} tickets`;
-          }
-        }
       }
     },
     scales: {
       y: {
         beginAtZero: true,
         ticks: {
-          maxTicksLimit: 10,
+          stepSize: 1,
           font: {
             size: 11
           }
@@ -153,13 +130,32 @@ function DashboardCharts({ data }) {
     }
   };
 
-  // Radar Chart Data - Total tickets by Region
+  // Calculate severity distribution
+  const severityCounts = {
+    'Emergency': 0,
+    'Critical': 0,
+    'High': 0,
+    'Medium': 0
+  };
+
+  runningTickets.forEach(ticket => {
+    const severity = ticket['Fault Level'];
+    if (severity && severityCounts.hasOwnProperty(severity)) {
+      severityCounts[severity]++;
+    }
+  });
+
   const radarChartData = {
-    labels: regions,
+    labels: ['Emergency', 'Critical', 'High', 'Medium'],
     datasets: [
       {
-        label: 'Tickets',
-        data: totalValues,
+        label: 'Running Tickets by Severity',
+        data: [
+          severityCounts['Emergency'],
+          severityCounts['Critical'],
+          severityCounts['High'],
+          severityCounts['Medium']
+        ],
         backgroundColor: 'rgba(99, 102, 241, 0.2)',
         borderColor: 'rgba(99, 102, 241, 1)',
         borderWidth: 3,
@@ -178,11 +174,19 @@ function DashboardCharts({ data }) {
     maintainAspectRatio: false,
     plugins: {
       legend: {
-        display: false
+        display: true,
+        position: 'top',
+        labels: {
+          font: {
+            size: 12,
+            weight: '500'
+          },
+          padding: 15
+        }
       },
       title: {
         display: true,
-        text: 'Tickets Distribution by Region',
+        text: '🎯 Tickets Distribution by Severity',
         font: {
           size: 16,
           weight: 'bold'
@@ -197,7 +201,7 @@ function DashboardCharts({ data }) {
       r: {
         beginAtZero: true,
         ticks: {
-          maxTicksLimit: 8,
+          stepSize: 1,
           font: {
             size: 11
           }

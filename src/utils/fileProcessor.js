@@ -49,7 +49,6 @@ export async function processFiles(uploadedFiles, filterType = 'all', podDay = 8
     }
 
     // Add FRT data to all records
-    let frtMatchCount = 0;
     mergedData = mergedData.map(row => {
       const orderId = row['Order ID'];
       const rowWithFrt = { ...row };
@@ -57,10 +56,10 @@ export async function processFiles(uploadedFiles, filterType = 'all', podDay = 8
       if (orderId && frtMap.has(orderId)) {
         const frtRow = frtMap.get(orderId);
         rowWithFrt['OWS FRT'] = frtRow['Fault Recovery Time(Process TT)'] || frtRow['Fault Recovery Time'] || null;
-        if (rowWithFrt['OWS FRT']) frtMatchCount++;
+        if (rowWithFrt['OWS FRT']) stats.frtMatches++;
       } else if (orderId && manualFrtMap.has(orderId)) {
         rowWithFrt['OWS FRT'] = manualFrtMap.get(orderId)['FRT'] || null;
-        if (rowWithFrt['OWS FRT']) frtMatchCount++;
+        if (rowWithFrt['OWS FRT']) stats.frtMatches++;
       } else {
         rowWithFrt['OWS FRT'] = null;
       }
@@ -70,9 +69,6 @@ export async function processFiles(uploadedFiles, filterType = 'all', podDay = 8
 
       return rowWithFrt;
     });
-
-    // Store FRT matches before filtering
-    stats.frtMatches = frtMatchCount;
 
     // Apply filter
     if (filterType === 'running') {
@@ -295,75 +291,39 @@ function calculatePODBacklogStatus(createdAtValue, podDay = 8) {
 
 // Calculate SLA/Non SLA status
 function calculateSLAStatus(ttType, title, alarmName) {
-  const ttTypeStr = String(ttType || '').trim().toLowerCase();
-  const titleStr = String(title || '').trim();
-  const alarmNameStr = String(alarmName || '').trim().toLowerCase();
-  const titleLower = titleStr.toLowerCase();
+  const ttTypeStr = String(ttType || '').toLowerCase();
+  const titleStr = String(title || '').toLowerCase();
+  const alarmNameStr = String(alarmName || '').toLowerCase();
 
-  let result = 'SLA'; // Default
+  // Non SLA conditions
+  if (ttTypeStr.includes('pm') || ttTypeStr.includes('preventive maintenance')) return 'Non SLA';
+  if (titleStr.includes('pm') || titleStr.includes('preventive')) return 'Non SLA';
+  if (alarmNameStr.includes('pm')) return 'Non SLA';
 
-  // Check TT Type filters first (most common)
-  if (ttTypeStr.includes('rssi') || ttTypeStr.includes('mw_hc') ||
-      ttTypeStr.includes('performance') || ttTypeStr.includes('optimization') ||
-      ttTypeStr.includes('quality') || ttTypeStr.includes('test')) {
-    result = 'Non SLA';
-  }
-  // Check title filters
-  else if (titleStr.includes('HC') || titleStr.includes('Performance issue') ||
-      titleStr.includes('PT :') || titleStr.includes('PT:') ||
-      titleStr.includes('Health Check') || titleStr.includes('PM Error') ||
-      titleLower.includes('visibility') || titleLower.includes('chassis') ||
-      titleLower.includes('dust')) {
-    result = 'Non SLA';
-  }
-  // Check alarm name
-  else if (alarmNameStr.includes('health')) {
-    result = 'Non SLA';
-  }
+  // NSA conditions
+  if (ttTypeStr.includes('nsa') || titleStr.includes('nsa')) return 'NSA';
 
-  return result;
+  // Default to SA
+  return 'SA';
 }
 
 // Calculate Domain
-function calculateDomain(impactValue) {
-  if (!impactValue) return null;
-
-  const value = String(impactValue).trim();
-  const upperValue = value.toUpperCase();
-
-  let result = null;
-
-  // Check for specific technology domains
-  if (upperValue.includes('IBS')) result = 'IBS';
-  else if (upperValue.includes('WIFI')) result = 'Wifi';
-  else if (upperValue.includes('TX')) result = 'TX';
-  else if (upperValue.includes('DWDM')) result = 'DWDM';
-  else if (upperValue.includes('IPRAN')) result = 'IPRAN';
-  else if (upperValue.includes('CS CORE')) result = 'CS CORE';
-  else if (upperValue.includes('ISP')) result = 'ISP';
-  else if (upperValue.includes('BNG')) result = 'BNG';
-  else if (upperValue.includes('IPBB')) result = 'IPBB';
-  else if (/^(SA|NSA)$/i.test(value) || /(2G|3G|LTE|5G)/i.test(value)) result = 'Access';
-
-  return result;
+function calculateDomain(impact) {
+  const impactStr = String(impact || '').toLowerCase();
+  if (impactStr.includes('core')) return 'Core';
+  if (impactStr.includes('transmission')) return 'Transmission';
+  if (impactStr.includes('access')) return 'Access';
+  if (impactStr.includes('power')) return 'Power';
+  return 'Other';
 }
 
 // Calculate Impact Service
-function calculateImpactService(impactValue) {
-  if (!impactValue) return null;
-
-  const value = String(impactValue).trim();
-  const upperValue = value.toUpperCase();
-
-  let result = null;
-
-  if (upperValue.includes('NSA')) {
-    result = 'NSA';
-  } else if (upperValue.includes('SA')) {
-    result = 'SA';
-  }
-
-  return result;
+function calculateImpactService(impact) {
+  const impactStr = String(impact || '').toLowerCase();
+  if (impactStr.includes('no service')) return 'No Service';
+  if (impactStr.includes('partial')) return 'Partial Service';
+  if (impactStr.includes('degraded')) return 'Degraded Service';
+  return 'Normal';
 }
 
 // Calculate duration between two dates
@@ -416,10 +376,10 @@ function calculateHurdleSLA(faultLevel, duration, unifiedStatus) {
   const durationHours = duration * 24;
 
   switch (faultLevelStr) {
-    case 'Emergency': return durationHours < 4 ? 'Within SLA' : 'Exceeded SLA';
-    case 'Critical': return durationHours < 6 ? 'Within SLA' : 'Exceeded SLA';
-    case 'Major': return durationHours < 12 ? 'Within SLA' : 'Exceeded SLA';
-    case 'Minor': return durationHours < 24 ? 'Within SLA' : 'Exceeded SLA';
+    case 'Emergency': return durationHours < 1 ? 'Within SLA' : 'Exceeded SLA';
+    case 'Critical': return durationHours < 2 ? 'Within SLA' : 'Exceeded SLA';
+    case 'Major': return durationHours < 4 ? 'Within SLA' : 'Exceeded SLA';
+    case 'Minor': return durationHours < 8 ? 'Within SLA' : 'Exceeded SLA';
     default: return null;
   }
 }

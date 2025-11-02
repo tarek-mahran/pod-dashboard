@@ -26,7 +26,7 @@ function SLAComparisonChart({ data }) {
       filteredData = filteredData.filter(r => r['Region'] === selectedRegion);
     }
 
-    const severities = ['Emergency', 'Critical', 'Major', 'Minor'];
+    const severities = ['Emergency', 'Critical', 'High', 'Medium'];
     const zainData = {};
     const latisData = {};
 
@@ -87,7 +87,7 @@ function SLAComparisonChart({ data }) {
   return (
     <div className="sla-comparison-container">
       <div className="sla-comparison-header">
-        <h2>🎯 SLA Performance Comparison</h2>
+        <h2>📊 SLA Comparison Chart</h2>
         <div className="sla-filters">
           <select
             value={selectedPOD}
@@ -112,56 +112,32 @@ function SLAComparisonChart({ data }) {
 
       <div className="sla-comparison-grid">
         {/* Zain SLA (Target) */}
-        <div className="sla-vendor-section zain-section">
+        <div className="sla-vendor-section">
           <div className="sla-vendor-header zain-header">
-            <h3>ZAIN CM SLA CAL.</h3>
+            <h3>🏆 Zain SLA (Target)</h3>
           </div>
           <div className="sla-cards">
-            {['Emergency', 'Critical', 'Major', 'Minor'].map(severity => (
-              <div key={severity} className="sla-row">
-                <div className="severity-label">{severity}</div>
-                <div className="sla-targets">
-                  <div className="sla-box target-box">
-                    <div className="box-label">TARGET</div>
-                    <div className={`box-value ${getColorClass(comparisonData.zain[severity].target)}`}>
-                      {comparisonData.zain[severity].target}%
-                    </div>
-                  </div>
-                  <div className="sla-box hurdle-box">
-                    <div className="box-label">HURDLE</div>
-                    <div className={`box-value ${getColorClass(comparisonData.zain[severity].hurdle || 0)}`}>
-                      {comparisonData.zain[severity].hurdle || 0}%
-                    </div>
-                  </div>
-                </div>
+            {['Emergency', 'Critical', 'High', 'Medium'].map(severity => (
+              <div key={severity} className={`sla-card ${getColorClass(comparisonData.zain[severity].target)}`}>
+                <div className="sla-card-severity">{severity}</div>
+                <div className="sla-card-percentage">{comparisonData.zain[severity].target}%</div>
+                <div className="sla-card-label">Target SLA</div>
               </div>
             ))}
           </div>
         </div>
 
         {/* Latis SLA (Hurdle) */}
-        <div className="sla-vendor-section latis-section">
+        <div className="sla-vendor-section">
           <div className="sla-vendor-header latis-header">
-            <h3>LATIS CM SLA CAL.</h3>
+            <h3>🎯 Latis SLA (Hurdle)</h3>
           </div>
           <div className="sla-cards">
-            {['Emergency', 'Critical', 'Major', 'Minor'].map(severity => (
-              <div key={severity} className="sla-row">
-                <div className="severity-label">{severity}</div>
-                <div className="sla-targets">
-                  <div className="sla-box target-box">
-                    <div className="box-label">TARGET</div>
-                    <div className={`box-value ${getColorClass(comparisonData.latis[severity].target || 0)}`}>
-                      {comparisonData.latis[severity].target || 0}%
-                    </div>
-                  </div>
-                  <div className="sla-box hurdle-box">
-                    <div className="box-label">HURDLE</div>
-                    <div className={`box-value ${getColorClass(comparisonData.latis[severity].hurdle)}`}>
-                      {comparisonData.latis[severity].hurdle}%
-                    </div>
-                  </div>
-                </div>
+            {['Emergency', 'Critical', 'High', 'Medium'].map(severity => (
+              <div key={severity} className={`sla-card ${getColorClass(comparisonData.latis[severity].hurdle)}`}>
+                <div className="sla-card-severity">{severity}</div>
+                <div className="sla-card-percentage">{comparisonData.latis[severity].hurdle}%</div>
+                <div className="sla-card-label">Hurdle SLA</div>
               </div>
             ))}
           </div>

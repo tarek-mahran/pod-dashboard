@@ -1,8 +1,8 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import html2canvas from 'html2canvas';
 import './PivotTable.css';
 
-function PivotTable({ data, onShowMessage, onDownloadClick }) {
+function PivotTable({ data, onShowMessage }) {
   const [selectedOwner, setSelectedOwner] = useState('All Owners');
   const [selectedPOD, setSelectedPOD] = useState('Overall');
   const [tableData, setTableData] = useState(null);
@@ -198,7 +198,7 @@ function PivotTable({ data, onShowMessage, onDownloadClick }) {
     <div className="pivot-table-container">
       <div className="pivot-table-header">
         <div className="pivot-table-title">
-          <h2>⚡ {getTableTitle()}</h2>
+          <h2>📋 {getTableTitle()}</h2>
         </div>
         <div className="pivot-table-controls">
           <select
@@ -297,12 +297,6 @@ function PivotTable({ data, onShowMessage, onDownloadClick }) {
           <div className="legend-color cell-red"></div>
           <span>&lt; 75% (Critical)</span>
         </div>
-      </div>
-
-      <div className="pivot-download-section">
-        <button onClick={onDownloadClick} className="pivot-download-btn">
-          📥 Download
-        </button>
       </div>
     </div>
   );

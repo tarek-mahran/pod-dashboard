@@ -2,14 +2,14 @@ import React, { useState, useEffect } from 'react';
 import * as XLSX from 'exceljs';
 import './DownloadModal.css';
 
-function DownloadModal({ show, onClose, uploadedFiles, fileMetadata, processedData, onShowMessage }) {
+function DownloadModal({ show, onClose, uploadedFiles, processedData, onShowMessage }) {
   const [fileInfo, setFileInfo] = useState([]);
 
   useEffect(() => {
     if (show) {
       updateFileInfo();
     }
-  }, [show, uploadedFiles, fileMetadata, processedData]);
+  }, [show, uploadedFiles, processedData]);
 
   const updateFileInfo = () => {
     const files = [
@@ -26,55 +26,50 @@ function DownloadModal({ show, onClose, uploadedFiles, fileMetadata, processedDa
       {
         id: 'netask',
         name: 'Netask PCMs',
-        fileName: fileMetadata?.netask?.name || 'Nextask_PCMs_All.xlsx',
+        fileName: uploadedFiles.netask?.name || 'Nextask_PCMs_All.xlsx',
         icon: '📄',
         description: 'Original Netask input file',
-        size: fileMetadata?.netask ? formatFileSize(fileMetadata.netask.size) : 'N/A',
-        lastUpdated: fileMetadata?.netask ? formatLastUpdated(fileMetadata.netask.lastModified) : 'N/A',
+        size: uploadedFiles.netask ? formatFileSize(uploadedFiles.netask.size) : 'N/A',
         available: !!uploadedFiles.netask,
         color: '#10b981'
       },
       {
         id: 'tms',
         name: 'TMS PCMs',
-        fileName: fileMetadata?.cmOperation?.name || 'TMS_PCMs_All.xlsx',
+        fileName: uploadedFiles.cmOperation?.name || 'TMS_PCMs_All.xlsx',
         icon: '📄',
         description: 'Original TMS/CM Operation file',
-        size: fileMetadata?.cmOperation ? formatFileSize(fileMetadata.cmOperation.size) : 'N/A',
-        lastUpdated: fileMetadata?.cmOperation ? formatLastUpdated(fileMetadata.cmOperation.lastModified) : 'N/A',
+        size: uploadedFiles.cmOperation ? formatFileSize(uploadedFiles.cmOperation.size) : 'N/A',
         available: !!uploadedFiles.cmOperation,
         color: '#ec4899'
       },
       {
         id: 'owsFrt',
         name: 'OWS FRT',
-        fileName: fileMetadata?.owsFrt?.name || 'OWS_FRT.xlsx',
+        fileName: uploadedFiles.owsFrt?.name || 'OWS_FRT.xlsx',
         icon: '📄',
         description: 'OWS FRT input file',
-        size: fileMetadata?.owsFrt ? formatFileSize(fileMetadata.owsFrt.size) : 'N/A',
-        lastUpdated: fileMetadata?.owsFrt ? formatLastUpdated(fileMetadata.owsFrt.lastModified) : 'N/A',
+        size: uploadedFiles.owsFrt ? formatFileSize(uploadedFiles.owsFrt.size) : 'N/A',
         available: !!uploadedFiles.owsFrt,
         color: '#f59e0b'
       },
       {
         id: 'manualFrt',
         name: 'Manual FRT',
-        fileName: fileMetadata?.manualFrt?.name || 'Manual_FRT.xlsx',
+        fileName: uploadedFiles.manualFrt?.name || 'Manual_FRT.xlsx',
         icon: '📄',
         description: 'Manual FRT input file',
-        size: fileMetadata?.manualFrt ? formatFileSize(fileMetadata.manualFrt.size) : 'N/A',
-        lastUpdated: fileMetadata?.manualFrt ? formatLastUpdated(fileMetadata.manualFrt.lastModified) : 'N/A',
+        size: uploadedFiles.manualFrt ? formatFileSize(uploadedFiles.manualFrt.size) : 'N/A',
         available: !!uploadedFiles.manualFrt,
         color: '#8b5cf6'
       },
       {
         id: 'podExcluded',
         name: 'POD Excluded',
-        fileName: fileMetadata?.podExcluded?.name || 'POD_Excluded.xlsx',
+        fileName: uploadedFiles.podExcluded?.name || 'POD_Excluded.xlsx',
         icon: '📄',
         description: 'POD excluded tickets file',
-        size: fileMetadata?.podExcluded ? formatFileSize(fileMetadata.podExcluded.size) : 'N/A',
-        lastUpdated: fileMetadata?.podExcluded ? formatLastUpdated(fileMetadata.podExcluded.lastModified) : 'N/A',
+        size: uploadedFiles.podExcluded ? formatFileSize(uploadedFiles.podExcluded.size) : 'N/A',
         available: !!uploadedFiles.podExcluded,
         color: '#ef4444'
       }
@@ -89,18 +84,6 @@ function DownloadModal({ show, onClose, uploadedFiles, fileMetadata, processedDa
     const sizes = ['Bytes', 'KB', 'MB', 'GB'];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
-  };
-
-  const formatLastUpdated = (timestamp) => {
-    if (!timestamp) return 'N/A';
-    const date = new Date(timestamp);
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    const hours = String(date.getHours()).padStart(2, '0');
-    const minutes = String(date.getMinutes()).padStart(2, '0');
-    const seconds = String(date.getSeconds()).padStart(2, '0');
-    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
   };
 
   const handleDownloadMerged = async () => {
@@ -171,34 +154,20 @@ function DownloadModal({ show, onClose, uploadedFiles, fileMetadata, processedDa
       podExcluded: uploadedFiles.podExcluded
     };
 
-    const metadataMap = {
-      netask: fileMetadata?.netask,
-      tms: fileMetadata?.cmOperation,
-      owsFrt: fileMetadata?.owsFrt,
-      manualFrt: fileMetadata?.manualFrt,
-      podExcluded: fileMetadata?.podExcluded
-    };
-
-    const workbook = fileMap[fileId];
-    const metadata = metadataMap[fileId];
-
-    if (!workbook) {
+    const file = fileMap[fileId];
+    if (!file) {
       onShowMessage('File not available', 'warning');
       return;
     }
 
     try {
-      // Convert workbook to buffer and download
-      const buffer = await workbook.xlsx.writeBuffer();
-      const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-      const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
-      link.href = url;
-      link.download = metadata?.name || `${fileId}.xlsx`;
+      link.href = URL.createObjectURL(file);
+      link.download = file.name;
       link.click();
-      window.URL.revokeObjectURL(url);
+      URL.revokeObjectURL(link.href);
 
-      onShowMessage(`${metadata?.name || fileId} downloaded successfully!`, 'success');
+      onShowMessage(`${file.name} downloaded successfully!`, 'success');
     } catch (error) {
       onShowMessage(`Download failed: ${error.message}`, 'error');
     }
@@ -235,10 +204,7 @@ function DownloadModal({ show, onClose, uploadedFiles, fileMetadata, processedDa
                   <div className="download-file-name">{file.name}</div>
                   <div className="download-file-description">{file.description}</div>
                   <div className="download-file-meta">
-                    <span className="download-file-size">
-                      Size: {file.size}
-                      {file.lastUpdated && file.id !== 'merged' && ` | Last Updated: ${file.lastUpdated}`}
-                    </span>
+                    <span className="download-file-size">{file.size}</span>
                     {file.available && (
                       <span className="download-file-filename">{file.fileName}</span>
                     )}
