@@ -40,6 +40,7 @@ function Dashboard({ data, uploadedFiles, onShowMessage }) {
     data.forEach(row => {
       const unifiedStatus = row['Unified Status'];
       const slaStatus = row['SLA/Non SLA'];
+      const impactService = row['Impact Service'];
       const faultLevel = row['Fault Level'];
       const region = row['Region'];
 
@@ -47,19 +48,22 @@ function Dashboard({ data, uploadedFiles, onShowMessage }) {
       if (unifiedStatus === 'Running' && region !== 'Stuck') {
         stats.running++;
 
-        // Count by SLA status
-        if (slaStatus === 'SA') {
+        // Count by Impact Service (SA/NSA)
+        if (impactService === 'SA') {
           stats.sa++;
           if (faultLevel === 'Emergency') stats.saEmergency++;
           else if (faultLevel === 'Critical') stats.saCritical++;
           else if (faultLevel === 'Major') stats.saMajor++;
           else if (faultLevel === 'Minor') stats.saMinor++;
-        } else if (slaStatus === 'NSA') {
+        } else if (impactService === 'NSA') {
           stats.nsa++;
           if (faultLevel === 'Critical') stats.nsaCritical++;
           else if (faultLevel === 'Major') stats.nsaMajor++;
           else if (faultLevel === 'Minor') stats.nsaMinor++;
-        } else if (slaStatus === 'Non SLA') {
+        }
+        
+        // Count Non SLA tickets
+        if (slaStatus === 'Non SLA') {
           stats.nonSla++;
         }
       }

@@ -42,7 +42,7 @@ function DashboardCharts({ data }) {
   
   runningTickets.forEach(ticket => {
     const region = ticket['Region'] || 'Unknown';
-    const slaStatus = ticket['SLA/Non SLA'];
+    const impactService = ticket['Impact Service'];
     
     if (!regionSACounts[region]) {
       regionSACounts[region] = 0;
@@ -50,9 +50,9 @@ function DashboardCharts({ data }) {
       regionTotalCounts[region] = 0;
     }
     
-    if (slaStatus === 'SA') {
+    if (impactService === 'SA') {
       regionSACounts[region]++;
-    } else if (slaStatus === 'NSA' || slaStatus === 'Non SLA') {
+    } else if (impactService === 'NSA') {
       regionNSACounts[region]++;
     }
     
