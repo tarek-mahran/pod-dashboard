@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import './Dashboard.css';
 
-function Dashboard({ data, uploadedFiles, onShowMessage }) {
+function Dashboard({ data, uploadedFiles, onShowMessage, filterType = 'all' }) {
   const [dashboardData, setDashboardData] = useState({
     running: 0,
+    received: 0,
     sa: 0,
     saEmergency: 0,
     saCritical: 0,
@@ -25,6 +26,7 @@ function Dashboard({ data, uploadedFiles, onShowMessage }) {
   const calculateDashboardStats = () => {
     const stats = {
       running: 0,
+      received: 0,
       sa: 0,
       saEmergency: 0,
       saCritical: 0,
@@ -51,6 +53,9 @@ function Dashboard({ data, uploadedFiles, onShowMessage }) {
       if (unifiedStatus === 'Running') {
         stats.running++;
       }
+
+      // Count all received tickets (total excluding Stuck)
+      stats.received++;
 
       // Count by Impact Service (SA/NSA) for all tickets
       if (impactService === 'SA') {
@@ -84,10 +89,14 @@ function Dashboard({ data, uploadedFiles, onShowMessage }) {
       {/* Dashboard Cards */}
       <div className="dashboard-cards" style={{ marginBottom: '40px' }}>
         <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr 1fr 1fr 1fr 1fr', gridTemplateRows: '1fr 1fr', gap: '16px' }}>
-          {/* Running Tickets - spans 2 rows */}
+          {/* Running/Received Tickets - spans 2 rows */}
           <div className="dashboard-card running-card" style={{ gridRow: 'span 2' }}>
-            <div className="card-value">{dashboardData.running}</div>
-            <div className="card-title">Running Tickets</div>
+            <div className="card-value">
+              {filterType === 'all' ? dashboardData.received : dashboardData.running}
+            </div>
+            <div className="card-title">
+              {filterType === 'all' ? 'Received Tickets' : 'Running Tickets'}
+            </div>
           </div>
 
           {/* SA Cards - First Row */}
@@ -144,7 +153,7 @@ function Dashboard({ data, uploadedFiles, onShowMessage }) {
           Total records processed: <strong>{data.length}</strong>
         </p>
         <p style={{ color: '#6b7280', marginTop: '10px' }}>
-          Running tickets: <strong>{dashboardData.running}</strong>
+          {filterType === 'all' ? 'Received tickets' : 'Running tickets'}: <strong>{filterType === 'all' ? dashboardData.received : dashboardData.running}</strong>
         </p>
       </div>
     </div>
