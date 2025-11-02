@@ -49,6 +49,7 @@ export async function processFiles(uploadedFiles, filterType = 'all', podDay = 8
     }
 
     // Add FRT data to all records
+    let frtMatchCount = 0;
     mergedData = mergedData.map(row => {
       const orderId = row['Order ID'];
       const rowWithFrt = { ...row };
@@ -56,10 +57,10 @@ export async function processFiles(uploadedFiles, filterType = 'all', podDay = 8
       if (orderId && frtMap.has(orderId)) {
         const frtRow = frtMap.get(orderId);
         rowWithFrt['OWS FRT'] = frtRow['Fault Recovery Time(Process TT)'] || frtRow['Fault Recovery Time'] || null;
-        if (rowWithFrt['OWS FRT']) stats.frtMatches++;
+        if (rowWithFrt['OWS FRT']) frtMatchCount++;
       } else if (orderId && manualFrtMap.has(orderId)) {
         rowWithFrt['OWS FRT'] = manualFrtMap.get(orderId)['FRT'] || null;
-        if (rowWithFrt['OWS FRT']) stats.frtMatches++;
+        if (rowWithFrt['OWS FRT']) frtMatchCount++;
       } else {
         rowWithFrt['OWS FRT'] = null;
       }
@@ -69,6 +70,9 @@ export async function processFiles(uploadedFiles, filterType = 'all', podDay = 8
 
       return rowWithFrt;
     });
+
+    // Store FRT matches before filtering
+    stats.frtMatches = frtMatchCount;
 
     // Apply filter
     if (filterType === 'running') {

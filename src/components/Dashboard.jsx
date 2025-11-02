@@ -44,28 +44,31 @@ function Dashboard({ data, uploadedFiles, onShowMessage }) {
       const faultLevel = row['Fault Level'];
       const region = row['Region'];
 
-      // Count running tickets (exclude "Stuck" region)
-      if (unifiedStatus === 'Running' && region !== 'Stuck') {
-        stats.running++;
+      // Exclude "Stuck" region
+      if (region === 'Stuck') return;
 
-        // Count by Impact Service (SA/NSA)
-        if (impactService === 'SA') {
-          stats.sa++;
-          if (faultLevel === 'Emergency') stats.saEmergency++;
-          else if (faultLevel === 'Critical') stats.saCritical++;
-          else if (faultLevel === 'Major') stats.saMajor++;
-          else if (faultLevel === 'Minor') stats.saMinor++;
-        } else if (impactService === 'NSA') {
-          stats.nsa++;
-          if (faultLevel === 'Critical') stats.nsaCritical++;
-          else if (faultLevel === 'Major') stats.nsaMajor++;
-          else if (faultLevel === 'Minor') stats.nsaMinor++;
-        }
-        
-        // Count Non SLA tickets
-        if (slaStatus === 'Non SLA') {
-          stats.nonSla++;
-        }
+      // Count running tickets
+      if (unifiedStatus === 'Running') {
+        stats.running++;
+      }
+
+      // Count by Impact Service (SA/NSA) for all tickets
+      if (impactService === 'SA') {
+        stats.sa++;
+        if (faultLevel === 'Emergency') stats.saEmergency++;
+        else if (faultLevel === 'Critical') stats.saCritical++;
+        else if (faultLevel === 'Major') stats.saMajor++;
+        else if (faultLevel === 'Minor') stats.saMinor++;
+      } else if (impactService === 'NSA') {
+        stats.nsa++;
+        if (faultLevel === 'Critical') stats.nsaCritical++;
+        else if (faultLevel === 'Major') stats.nsaMajor++;
+        else if (faultLevel === 'Minor') stats.nsaMinor++;
+      }
+      
+      // Count Non SLA tickets
+      if (slaStatus === 'Non SLA') {
+        stats.nonSla++;
       }
     });
 

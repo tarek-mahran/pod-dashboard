@@ -34,13 +34,13 @@ function DashboardCharts({ data }) {
   }
 
   // Calculate region distribution with SA/NSA breakdown (exclude "Stuck")
-  const runningTickets = data.filter(r => r['Unified Status'] === 'Running' && r['Region'] !== 'Stuck');
+  const allTickets = data.filter(r => r['Region'] !== 'Stuck');
   
   const regionSACounts = {};
   const regionNSACounts = {};
   const regionTotalCounts = {};
   
-  runningTickets.forEach(ticket => {
+  allTickets.forEach(ticket => {
     const region = ticket['Region'] || 'Unknown';
     const impactService = ticket['Impact Service'];
     
@@ -106,7 +106,7 @@ function DashboardCharts({ data }) {
       },
       title: {
         display: true,
-        text: 'Running Tickets Per Regions (SA & NSA)',
+        text: 'Tickets Per Regions (SA & NSA)',
         font: {
           size: 16,
           weight: 'bold'
@@ -158,7 +158,7 @@ function DashboardCharts({ data }) {
     labels: regions,
     datasets: [
       {
-        label: 'Running Tickets',
+        label: 'Tickets',
         data: totalValues,
         backgroundColor: 'rgba(99, 102, 241, 0.2)',
         borderColor: 'rgba(99, 102, 241, 1)',
@@ -182,7 +182,7 @@ function DashboardCharts({ data }) {
       },
       title: {
         display: true,
-        text: 'Running Tickets Distribution by Region',
+        text: 'Tickets Distribution by Region',
         font: {
           size: 16,
           weight: 'bold'
