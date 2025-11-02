@@ -291,39 +291,75 @@ function calculatePODBacklogStatus(createdAtValue, podDay = 8) {
 
 // Calculate SLA/Non SLA status
 function calculateSLAStatus(ttType, title, alarmName) {
-  const ttTypeStr = String(ttType || '').toLowerCase();
-  const titleStr = String(title || '').toLowerCase();
-  const alarmNameStr = String(alarmName || '').toLowerCase();
+  const ttTypeStr = String(ttType || '').trim().toLowerCase();
+  const titleStr = String(title || '').trim();
+  const alarmNameStr = String(alarmName || '').trim().toLowerCase();
+  const titleLower = titleStr.toLowerCase();
 
-  // Non SLA conditions
-  if (ttTypeStr.includes('pm') || ttTypeStr.includes('preventive maintenance')) return 'Non SLA';
-  if (titleStr.includes('pm') || titleStr.includes('preventive')) return 'Non SLA';
-  if (alarmNameStr.includes('pm')) return 'Non SLA';
+  let result = 'SLA'; // Default
 
-  // NSA conditions
-  if (ttTypeStr.includes('nsa') || titleStr.includes('nsa')) return 'NSA';
+  // Check TT Type filters first (most common)
+  if (ttTypeStr.includes('rssi') || ttTypeStr.includes('mw_hc') ||
+      ttTypeStr.includes('performance') || ttTypeStr.includes('optimization') ||
+      ttTypeStr.includes('quality') || ttTypeStr.includes('test')) {
+    result = 'Non SLA';
+  }
+  // Check title filters
+  else if (titleStr.includes('HC') || titleStr.includes('Performance issue') ||
+      titleStr.includes('PT :') || titleStr.includes('PT:') ||
+      titleStr.includes('Health Check') || titleStr.includes('PM Error') ||
+      titleLower.includes('visibility') || titleLower.includes('chassis') ||
+      titleLower.includes('dust')) {
+    result = 'Non SLA';
+  }
+  // Check alarm name
+  else if (alarmNameStr.includes('health')) {
+    result = 'Non SLA';
+  }
 
-  // Default to SA
-  return 'SA';
+  return result;
 }
 
 // Calculate Domain
-function calculateDomain(impact) {
-  const impactStr = String(impact || '').toLowerCase();
-  if (impactStr.includes('core')) return 'Core';
-  if (impactStr.includes('transmission')) return 'Transmission';
-  if (impactStr.includes('access')) return 'Access';
-  if (impactStr.includes('power')) return 'Power';
-  return 'Other';
+function calculateDomain(impactValue) {
+  if (!impactValue) return null;
+
+  const value = String(impactValue).trim();
+  const upperValue = value.toUpperCase();
+
+  let result = null;
+
+  // Check for specific technology domains
+  if (upperValue.includes('IBS')) result = 'IBS';
+  else if (upperValue.includes('WIFI')) result = 'Wifi';
+  else if (upperValue.includes('TX')) result = 'TX';
+  else if (upperValue.includes('DWDM')) result = 'DWDM';
+  else if (upperValue.includes('IPRAN')) result = 'IPRAN';
+  else if (upperValue.includes('CS CORE')) result = 'CS CORE';
+  else if (upperValue.includes('ISP')) result = 'ISP';
+  else if (upperValue.includes('BNG')) result = 'BNG';
+  else if (upperValue.includes('IPBB')) result = 'IPBB';
+  else if (/^(SA|NSA)$/i.test(value) || /(2G|3G|LTE|5G)/i.test(value)) result = 'Access';
+
+  return result;
 }
 
 // Calculate Impact Service
-function calculateImpactService(impact) {
-  const impactStr = String(impact || '').toLowerCase();
-  if (impactStr.includes('no service')) return 'No Service';
-  if (impactStr.includes('partial')) return 'Partial Service';
-  if (impactStr.includes('degraded')) return 'Degraded Service';
-  return 'Normal';
+function calculateImpactService(impactValue) {
+  if (!impactValue) return null;
+
+  const value = String(impactValue).trim();
+  const upperValue = value.toUpperCase();
+
+  let result = null;
+
+  if (upperValue.includes('NSA')) {
+    result = 'NSA';
+  } else if (upperValue.includes('SA')) {
+    result = 'SA';
+  }
+
+  return result;
 }
 
 // Calculate duration between two dates
@@ -376,10 +412,10 @@ function calculateHurdleSLA(faultLevel, duration, unifiedStatus) {
   const durationHours = duration * 24;
 
   switch (faultLevelStr) {
-    case 'Emergency': return durationHours < 1 ? 'Within SLA' : 'Exceeded SLA';
-    case 'Critical': return durationHours < 2 ? 'Within SLA' : 'Exceeded SLA';
-    case 'Major': return durationHours < 4 ? 'Within SLA' : 'Exceeded SLA';
-    case 'Minor': return durationHours < 8 ? 'Within SLA' : 'Exceeded SLA';
+    case 'Emergency': return durationHours < 4 ? 'Within SLA' : 'Exceeded SLA';
+    case 'Critical': return durationHours < 6 ? 'Within SLA' : 'Exceeded SLA';
+    case 'Major': return durationHours < 12 ? 'Within SLA' : 'Exceeded SLA';
+    case 'Minor': return durationHours < 24 ? 'Within SLA' : 'Exceeded SLA';
     default: return null;
   }
 }
