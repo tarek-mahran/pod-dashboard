@@ -392,6 +392,7 @@ function App() {
               uploadedFiles={uploadedFiles}
               onShowMessage={showMessage}
               filterType={filterType}
+              stats={stats}
             />
             <DashboardCharts data={displayData} />
             <SLAComparisonChart data={displayData} />

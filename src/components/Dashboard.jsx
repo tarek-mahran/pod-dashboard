@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './Dashboard.css';
 
-function Dashboard({ data, uploadedFiles, onShowMessage, filterType = 'all' }) {
+function Dashboard({ data, uploadedFiles, onShowMessage, filterType = 'all', stats }) {
   const [dashboardData, setDashboardData] = useState({
     running: 0,
     received: 0,
@@ -142,6 +142,19 @@ function Dashboard({ data, uploadedFiles, onShowMessage, filterType = 'all' }) {
             <div className="card-value">{dashboardData.nsaMinor}</div>
             <div className="card-title">Minor NSA</div>
           </div>
+        </div>
+      </div>
+
+      {/* FRT Matched Card */}
+      <div style={{ marginBottom: '40px' }}>
+        <div className="dashboard-card" style={{ 
+          maxWidth: '300px', 
+          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+          color: 'white'
+        }}>
+          <div className="card-icon" style={{ fontSize: '2em', marginBottom: '10px' }}>⏱️</div>
+          <div className="card-title" style={{ color: 'rgba(255, 255, 255, 0.9)', marginBottom: '8px' }}>FRT MATCHED</div>
+          <div className="card-value" style={{ color: 'white' }}>{stats?.frtMatches || 0}</div>
         </div>
       </div>
 
